@@ -85,6 +85,7 @@ public:
             this->username = "";
             this->login_state = 0;
             this->userid = 0;
+            this->accountid = 0;
         } else {
             std::cerr << "Error: Not logged in" << std::endl;
         }
@@ -98,7 +99,7 @@ public:
         this->userid = id;
     }
 
-    void createaccount(void) {
+    int createaccount(void) {
         if (login_state == 1) {
             std::string createQuery =
             "INSERT INTO accounts (balance, userid) "
@@ -115,8 +116,10 @@ public:
 
             std::cout << "Account successfully created\n";
             std::cout << "Account ID: " << rowCount << "\n";
+            return rowCount;
         } else {
             std::cout << "Login to user to create bank account\n";
+            return -1;
         }
     }
 
@@ -149,7 +152,10 @@ public:
         }
 
         if (reply == "y") {
-            createaccount();
+            int createdid = createaccount();
+            this->accountid = createdid;
+            std::cout << "Account with ID " << this->accountid << " selected\n";
+            return;
         } else if (reply == "n") {
             return;
         }
