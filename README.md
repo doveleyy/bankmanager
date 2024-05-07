@@ -1,2 +1,2 @@
-Database Schema:
-![db](https://github.com/doveleyy/bankmanager/assets/101972440/994751b2-a7d1-4f64-bbe6-ef14c987f96f)
+## Database Schema:
+![Untitled-3](https://github.com/doveleyy/bankmanager/assets/101972440/70bc955b-b4f4-481e-9461-71aefdd8bd94)
