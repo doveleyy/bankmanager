@@ -289,6 +289,12 @@ void checkdb(int rc, const char* errMsg) {
     }
 }
 
+void checkdb(int rc) {
+    std::cerr << "the error code is " << rc << "\n";
+    sqlite3_free(const_cast<char*>(errMsg));
+    sqlite3_close(db);
+}
+
 void initialize(void) {
     int rc = sqlite3_open("bankdetails.db", &db);
     if (rc != SQLITE_OK) { // SQLITE_OK evals to 0, rc != 0 means failed
@@ -314,11 +320,11 @@ void initialize(void) {
         "CREATE TABLE IF NOT EXISTS transactions"
         "(id INTEGER PRIMARY KEY, "
         "transactiontype INTEGER NOT NULL, "
-        "usertransferring TEXT NOT NULL, "
-        "userreceiving TEXT NOT NULL, "
+        "accounttransferring INTEGER NOT NULL, "
+        "accountreceiving INTEGER NOT NULL, "
         "amount INTEGER NOT NULL, "
-        "FOREIGN KEY(usertransferring) REFERENCES users(id), "
-        "FOREIGN KEY(userreceiving) REFERENCES users(id))";
+        "FOREIGN KEY(accounttransferring) REFERENCES accounts(id), "
+        "FOREIGN KEY(accountreceiving) REFERENCES accounts(id))";
 
     rc = sqlite3_exec(db, createUserTable, nullptr, nullptr, &errMsg);
     checkdb(rc, errMsg);
@@ -340,11 +346,33 @@ void createUser(void) {
     std::cin >> password;
 
     std::string createQuery = 
-    "INSERT INTO users (username, password) "
-    "VALUES ('" + username + "', '" + password + "')";
+    "INSERT INTO users (username, password) VALUES (?, ?)";
+
+    sqlite3_stmt* stmt;
+
+    int rc = sqlite3_prepare_v2(db, createQuery.c_str(), -1, &stmt, nullptr);
+    checkdb(rc);
+
+    rc = sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Error binding password: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return;
+    }
+
+    rc = sqlite3_bind_text(stmt, 2, password.c_str(), -1, SQLITE_STATIC);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Error binding password: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_finalize(stmt);
+        return;
+    }
     
-    int rc = sqlite3_exec(db, createQuery.c_str(), nullptr, nullptr, &errMsg);
-    checkdb(rc, errMsg);
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        std::cerr << "Error executing statement: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
 }
 
 //LOGIN
