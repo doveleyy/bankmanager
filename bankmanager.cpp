@@ -289,12 +289,6 @@ void checkdb(int rc, const char* errMsg) {
     }
 }
 
-void checkdb(int rc) {
-    std::cerr << "the error code is " << rc << "\n";
-    sqlite3_free(const_cast<char*>(errMsg));
-    sqlite3_close(db);
-}
-
 void initialize(void) {
     int rc = sqlite3_open("bankdetails.db", &db);
     if (rc != SQLITE_OK) { // SQLITE_OK evals to 0, rc != 0 means failed
