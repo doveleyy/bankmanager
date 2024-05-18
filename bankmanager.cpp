@@ -345,7 +345,7 @@ void createUser(void) {
     sqlite3_stmt* stmt;
 
     int rc = sqlite3_prepare_v2(db, createQuery.c_str(), -1, &stmt, nullptr);
-    checkdb(rc);
+    checkdb(rc, errMsg);
 
     rc = sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
     if (rc != SQLITE_OK) {
